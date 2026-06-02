@@ -13,7 +13,7 @@ export const avatarFrames = {
     title: {
       x: 450,
       y: 1300,
-      fontSize: 65,
+      fontSize: 50,
       color: "#e90a0a",
 
       align: "center",
@@ -23,7 +23,7 @@ export const avatarFrames = {
     fullName: {
       x: 450,
       y: 1380,
-      fontSize: 70,
+      fontSize: 60,
       color: "#c40c0c",
 
       align: "center",
@@ -45,7 +45,7 @@ export const avatarFrames = {
     title: {
       x: 450,
       y: 1300,
-      fontSize: 65,
+      fontSize: 50,
       color: "#033107",
 
       align: "center",
@@ -55,7 +55,7 @@ export const avatarFrames = {
     fullName: {
       x: 450,
       y: 1380,
-      fontSize: 80,
+      fontSize: 60,
       color: "#033107",
 
       align: "center",
