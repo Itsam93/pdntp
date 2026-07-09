@@ -1,36 +1,30 @@
-import logo from "../assets/pdntp-logo.png";
+import logo from "../assets/healing-streams-logo.png";
 
 function Hero() {
   return (
-    <section className="relative flex flex-col items-center justify-center text-center py-20 px-6 bg-gradient-to-b from-white via-emerald-50/40 to-white">
+    <section className="flex flex-col items-center lg:items-start text-center lg:text-left py-8">
 
-      {/* COMPLETION BANNER */}
-
-      {/* LOGO */}
-      <div className="mb-6 flex items-center justify-center">
+      {/* Logo */}
+      <div className="flex justify-center w-full mb-8">
         <img
           src={logo}
-          alt="PDNTP Logo"
-          className="h-40 w-auto object-contain"
+          alt="Healing Streams Live Healing Services"
+          className="h-32 md:h-40 lg:h-44 w-auto object-contain"
         />
       </div>
 
-      {/* TITLE */}
-      <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-        Pastoral and Deaconary Nominees Training Program (PDNTP)
+      {/* Main Heading */}
+      <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-white">
+        Sponsor Healing To The Nations Magazines
       </h1>
 
-      {/* SUBTITLE */}
-      <p className="mt-4 max-w-xl text-base md:text-lg text-gray-600">
-        Create your Pastors and Deaconary avatars.
-      </p>
+      {/* Decorative Line */}
+      <div className="mt-8 h-1 w-32 rounded-full bg-gradient-to-r from-green-400 via-white to-red-500" />
 
-      {/* ACCENT LINE */}
-      <div className="mt-8 h-[3px] w-28 bg-gradient-to-r from-emerald-500 to-yellow-400 rounded-full" />
-
-      {/* BRAND HINT TEXT */}
-      <p className="mt-6 text-xs tracking-wider text-gray-400 uppercase">
-        Powered by PDNTP 2026
+      {/* Supporting Text */}
+      <p className="mt-8 text-sm md:text-base text-white/80 max-w-xl">
+        Join millions around the world in spreading hope, healing, and the
+        Gospel by sponsoring the Healing To The Nations (HTTN) Magainzes.
       </p>
 
     </section>

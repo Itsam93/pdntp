@@ -6,12 +6,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-
-      <Route
-        path="/avatar/:type"
-        element={<AvatarPage />}
-      />
-
+      <Route path="/avatar" element={<AvatarPage />} />
     </Routes>
   );
 }

@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import AvatarCanvas from "../components/AvatarCanvas";
 import { avatarFrames } from "../config/avatarFrames";
 import { avatarAssets } from "../config/avatarAssets";
 
 function AvatarPage() {
-  const { type } = useParams();
   const navigate = useNavigate();
 
   const canvasRef = useRef(null);
@@ -21,8 +20,9 @@ function AvatarPage() {
   const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  const config = useMemo(() => avatarFrames[type] || null, [type]);
-  const frameImage = useMemo(() => avatarAssets[type]?.frame || null, [type]);
+  // Single Healing Streams configuration
+  const config = avatarFrames.healingStreams;
+  const frameImage = avatarAssets.healingStreams.frame;
 
   // =========================
   // LOAD USER
@@ -30,19 +30,13 @@ function AvatarPage() {
   useEffect(() => {
     const stored = localStorage.getItem("avatarUser");
 
-    if (!stored || !config || !frameImage) {
+    if (!stored) {
       navigate("/");
       return;
     }
 
     setUser(JSON.parse(stored));
-  }, [config, frameImage, navigate]);
-
-  // =========================
-  // NORMALIZE TEXT
-  // =========================
-  const fullName = user?.fullName?.toUpperCase() || "";
-  const title = user?.title?.toUpperCase() || "";
+  }, [navigate]);
 
   // =========================
   // IMAGE UPLOAD
@@ -53,8 +47,9 @@ function AvatarPage() {
     const url = URL.createObjectURL(file);
 
     const img = new Image();
+
     img.onload = () => {
-      const baseSize = 1536;
+      const baseSize = config.canvasSize || 1536;
 
       const scale = Math.max(
         baseSize / img.width,
@@ -79,6 +74,7 @@ function AvatarPage() {
   // =========================
   const onMouseDown = (e) => {
     setDragging(true);
+
     setDragStart({
       x: e.clientX - position.x * zoom,
       y: e.clientY - position.y * zoom,
@@ -105,16 +101,20 @@ function AvatarPage() {
     try {
       await fetch(`${import.meta.env.VITE_API_URL}/api/download`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          fullName: user.fullName,
           title: user.title,
-          zone: user.zone,
-          region: user.region,
-          type,
+          fullName: user.fullName,
+          churchName: user.churchName,
+          magazineCategory: user.magazineCategory,
+          numberOfCopies: user.numberOfCopies,
         }),
       });
-    } catch {}
+    } catch {
+      // Ignore analytics errors
+    }
   };
 
   const handleDownload = async () => {
@@ -122,41 +122,30 @@ function AvatarPage() {
     canvasRef.current?.download?.();
   };
 
-  if (!config || !frameImage) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#1c120c] text-white">
-        Invalid avatar configuration
-      </div>
-    );
-  }
-
   if (!user) return null;
 
   const hasImage = Boolean(image);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1c120c] via-[#2b1b12] to-[#3a2418] px-6 py-10">
-
-      {/* HEADER */}
-      <div className="text-center mb-10 text-white">
-        <h1 className="text-3xl font-bold">
-          Create Your {type === "pastor" ? "Pastor" : "Deacon"} Avatar
+    <div className="min-h-screen bg-gradient-to-br from-[#0B7A3B] via-[#0F8E46] to-[#0C5AA6] px-6 py-10">
+      {/* Header */}
+      <div className="mb-10 text-center text-white">
+        <h1 className="text-4xl font-bold">
+          Create Your Healing Streams Avatar
         </h1>
 
-        <p className="text-white/60 mt-2">
-          Upload, adjust, and download your official avatar
+        <p className="mt-3 text-white/90">
+          Upload your photo, adjust it, and download your personalized
+          Healing Streams avatar.
         </p>
       </div>
 
-      {/* UPLOAD CARD */}
-      <div className="mb-6 max-w-2xl mx-auto rounded-2xl bg-[#f7f1ec] p-6 shadow-xl">
-
+      {/* Upload Card */}
+      <div className="mx-auto mb-6 max-w-2xl rounded-3xl bg-white p-6 shadow-xl">
         <div className="flex flex-col items-center gap-4">
-
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="px-6 py-3 rounded-xl bg-[#3a2418] text-white font-medium
-              hover:bg-[#4a2f1f] transition"
+            className="rounded-xl bg-[#0B7A3B] px-6 py-3 font-semibold text-white transition hover:bg-[#096431]"
           >
             Choose Image
           </button>
@@ -170,17 +159,15 @@ function AvatarPage() {
           />
 
           <p className="text-sm text-gray-500">
-            Supported: JPG, PNG, WEBP
+            Supported formats: JPG, PNG and WEBP
           </p>
-
         </div>
       </div>
 
-      {/* CONTROLS */}
+      {/* Zoom Control */}
       {hasImage && (
-        <div className="mb-6 max-w-2xl mx-auto rounded-2xl bg-[#f7f1ec] p-4 shadow-md">
-
-          <label className="text-sm text-gray-700 block mb-2">
+        <div className="mx-auto mb-6 max-w-2xl rounded-3xl bg-white p-5 shadow-lg">
+          <label className="mb-2 block text-sm font-medium text-gray-700">
             Zoom
           </label>
 
@@ -191,13 +178,12 @@ function AvatarPage() {
             step="0.01"
             value={zoom}
             onChange={(e) => setZoom(Number(e.target.value))}
-            className="w-full"
+            className="w-full accent-green-700"
           />
-
         </div>
       )}
 
-      {/* CANVAS */}
+      {/* Canvas */}
       {hasImage && (
         <div
           className="flex justify-center"
@@ -210,8 +196,8 @@ function AvatarPage() {
             ref={canvasRef}
             uploadedImage={image}
             frameImage={frameImage}
-            title={title}
-            fullName={fullName}
+            fullName={user.fullName}
+            numberOfCopies={user.numberOfCopies}
             config={config}
             zoom={zoom}
             position={position}
@@ -219,17 +205,12 @@ function AvatarPage() {
         </div>
       )}
 
-      {/* ACTIONS */}
+      {/* Actions */}
       {hasImage && (
         <div className="mt-10 flex flex-col items-center gap-4">
-
           <button
             onClick={handleDownload}
-            className="w-full max-w-xs px-6 py-3 rounded-xl
-              bg-gradient-to-r from-[#3a2418] to-[#5a3a25]
-              text-white font-semibold shadow-lg
-              hover:scale-[1.02] hover:shadow-xl
-              active:scale-95 transition-all"
+            className="w-full max-w-xs rounded-xl bg-gradient-to-r from-[#0B7A3B] to-[#0C5AA6] px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-95"
           >
             Download Avatar
           </button>
@@ -240,15 +221,12 @@ function AvatarPage() {
               setZoom(1);
               setPosition({ x: 0, y: 0 });
             }}
-            className="text-sm text-white/70 underline underline-offset-4
-              hover:text-white transition"
+            className="text-sm text-white underline underline-offset-4 transition hover:text-green-100"
           >
             Change Picture
           </button>
-
         </div>
       )}
-
     </div>
   );
 }

@@ -5,8 +5,9 @@ import Spinner from "./Spinner";
 const initialFormState = {
   title: "",
   fullName: "",
-  zone: "",
-  region: "",
+  churchName: "",
+  magazineCategory: "",
+  numberOfCopies: "",
 };
 
 function RegistrationForm() {
@@ -23,26 +24,90 @@ function RegistrationForm() {
       ...prev,
       [name]: value,
     }));
+
+    if (error) setError("");
+  };
+
+  const validateCopies = (category, copies) => {
+    const count = Number(copies);
+
+    if (isNaN(count) || count <= 0) {
+      return "Please enter a valid number of copies.";
+    }
+
+    switch (category) {
+      case "1-99":
+        if (count < 1 || count > 99) {
+          return "For the selected category, the number of copies must be between 1 and 99.";
+        }
+        break;
+
+      case "100-499":
+        if (count < 100 || count > 499) {
+          return "For the selected category, the number of copies must be between 100 and 499.";
+        }
+        break;
+
+      case "500-999":
+        if (count < 500 || count > 999) {
+          return "For the selected category, the number of copies must be between 500 and 999.";
+        }
+        break;
+
+      case "1000+":
+        if (count < 1000) {
+          return "For the selected category, the number of copies must be 1000 or more.";
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return "";
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    const { title, fullName, zone, region } = formData;
+    const {
+      title,
+      fullName,
+      churchName,
+      magazineCategory,
+      numberOfCopies,
+    } = formData;
 
-    if (!title || !fullName || !zone || !region) {
+    if (
+      !title ||
+      !fullName ||
+      !churchName ||
+      !magazineCategory ||
+      !numberOfCopies
+    ) {
       setError("Please complete all fields.");
+      return;
+    }
+
+    const validationError = validateCopies(
+      magazineCategory,
+      numberOfCopies
+    );
+
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     try {
       setIsSubmitting(true);
 
-      // Save locally for avatar page
-      localStorage.setItem("avatarUser", JSON.stringify(formData));
+      localStorage.setItem(
+        "avatarUser",
+        JSON.stringify(formData)
+      );
 
-      // Optional API call
       try {
         await fetch(`${import.meta.env.VITE_API_URL}/api/register`, {
           method: "POST",
@@ -52,55 +117,48 @@ function RegistrationForm() {
           body: JSON.stringify(formData),
         });
       } catch {
-        // ignore analytics failure
       }
 
-      const avatarType =
-        title === "Pastor"
-          ? "pastor"
-          : "deacon";
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      // small UX delay so spinner is visible
-      await new Promise((res) => setTimeout(res, 800));
-
-      navigate(`/avatar/${avatarType}`);
-    } catch (err) {
-      setError("Something went wrong.");
+      navigate("/avatar");
+    } catch {
+      setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <section className="mx-auto w-full max-w-2xl px-6 py-12">
-
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm relative">
-
-        {/* LOADING OVERLAY */}
+    <section className="mx-auto w-full max-w-2xl">
+      <div className="relative rounded-3xl border border-green-100 bg-white p-8 shadow-xl">
+        {/* Loading Overlay */}
         {isSubmitting && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-2xl z-10">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-white/80 backdrop-blur-sm">
             <Spinner />
           </div>
         )}
 
-        {/* FORM CONTENT */}
-        <div className={isSubmitting ? "opacity-40 pointer-events-none" : ""}>
-
+        <div
+          className={
+            isSubmitting ? "pointer-events-none opacity-40" : ""
+          }
+        >
+          {/* Heading */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Registration Form
+            <h2 className="text-3xl font-bold text-gray-900">
+              Generate Your Avatar
             </h2>
 
-            <p className="mt-2 text-sm text-gray-600">
-              Complete the form below to proceed.
+            <p className="mt-2 text-gray-600">
+              Sponsor the Healing To The Nations Magazines
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-
-            {/* TITLE */}
+            {/* Title */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Title
               </label>
 
@@ -108,79 +166,129 @@ function RegistrationForm() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full rounded-lg border px-4 py-3 focus:border-black outline-none"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-600"
               >
                 <option value="">Select Title</option>
                 <option value="Pastor">Pastor</option>
                 <option value="Deacon">Deacon</option>
                 <option value="Deaconess">Deaconess</option>
+                <option value="Brother">Brother</option>
+                <option value="Sister">Sister</option>
+                <option value="Miss">Miss</option>
+                <option value="Master">Master</option>
               </select>
             </div>
 
-            {/* FULL NAME */}
+            {/* Full Name */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Full Name
               </label>
 
               <input
-                name="fullName"
                 type="text"
+                name="fullName"
+                placeholder="Enter your full name"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="w-full rounded-lg border px-4 py-3 focus:border-black outline-none"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-600"
               />
             </div>
 
-            {/* ZONE */}
+            {/* Church Name */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Zone
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                Name of Church
               </label>
 
               <input
-                name="zone"
                 type="text"
-                value={formData.zone}
+                name="churchName"
+                placeholder="Enter your church name"
+                value={formData.churchName}
                 onChange={handleChange}
-                className="w-full rounded-lg border px-4 py-3 focus:border-black outline-none"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-600"
               />
             </div>
 
-            {/* REGION */}
+            {/* Sponsorship Category */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Region
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                Select your category
               </label>
 
-              <input
-                name="region"
-                type="text"
-                value={formData.region}
+              <select
+                name="magazineCategory"
+                value={formData.magazineCategory}
                 onChange={handleChange}
-                className="w-full rounded-lg border px-4 py-3 focus:border-black outline-none"
-              />
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-600"
+              >
+                <option value="">Select Sponsorship Category</option>
+
+                <option value="1-99">
+                  1 – 99 Copies (₦600 – ₦59,400 | 0.3 – 29.7 Espees)
+                </option>
+
+                <option value="100-499">
+                  100 – 499 Copies (₦60,000 – ₦299,400 | 30 – 149.7
+                  Espees)
+                </option>
+
+                <option value="500-999">
+                  500 – 999 Copies (₦300,000 – ₦599,400 | 150 – 299.7
+                  Espees)
+                </option>
+
+                <option value="1000+">
+                  1000 Copies and Above (₦600,000 and above | 300
+                  Espees and above)
+                </option>
+              </select>
             </div>
 
-            {/* ERROR */}
+            {/* Number of Copies */}
+            {formData.magazineCategory && (
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-gray-700">
+                  Number of Copies
+                </label>
+
+                <input
+                  type="number"
+                  name="numberOfCopies"
+                  min="1"
+                  placeholder="Enter the exact number of copies"
+                  value={formData.numberOfCopies}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-green-600"
+                />
+
+                <p className="mt-2 text-xs text-gray-500">
+                  Enter the exact number of magazines you are
+                  sponsoring.
+                </p>
+              </div>
+            )}
+
+            {/* Error */}
             {error && (
-              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+              <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
               </div>
             )}
 
-            {/* SUBMIT BUTTON */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-lg bg-[#3a2418] text-white py-3 font-medium transition disabled:opacity-60"
+              className="w-full rounded-xl bg-[#0B7A3B] py-3 font-semibold text-white transition hover:bg-[#096431] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Generate Avatar
+              {isSubmitting
+                ? "Generating Avatar..."
+                : "Generate My Avatar"}
             </button>
-
           </form>
         </div>
-
       </div>
     </section>
   );

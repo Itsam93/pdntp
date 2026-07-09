@@ -1,11 +1,7 @@
-import pastorFrame from "../assets/pastor-frame.jpg";
-import deaconFrame from "../assets/deacon-frame.jpg";
+import healingStreamsFrame from "../assets/frame.png";
 
 export const avatarAssets = {
-  pastor: {
-    frame: pastorFrame,
-  },
-  deacon: {
-    frame: deaconFrame,
+  healingStreams: {
+    frame: healingStreamsFrame,
   },
 };

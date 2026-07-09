@@ -1,12 +1,17 @@
-import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
+import {
+  useEffect,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import { createFrameLocator } from "../utils/frameLocator";
 
 const AvatarCanvas = forwardRef(function AvatarCanvas(
   {
     uploadedImage,
     frameImage,
-    title,
     fullName,
+    numberOfCopies,
     config,
     zoom = 1,
     position = { x: 0, y: 0 },
@@ -56,7 +61,6 @@ const AvatarCanvas = forwardRef(function AvatarCanvas(
     const render = async () => {
       await Promise.all([load(userImage), load(frame)]);
 
-      await document.fonts.load("600 48px Montserrat");
       await document.fonts.load("700 48px Montserrat");
 
       canvas.width = SIZE;
@@ -64,8 +68,10 @@ const AvatarCanvas = forwardRef(function AvatarCanvas(
 
       ctx.clearRect(0, 0, SIZE, SIZE);
 
+      // Draw frame first
       ctx.drawImage(frame, 0, 0, SIZE, SIZE);
 
+      // Position user image
       const centerX = config.photo.x + config.photo.width / 2;
       const centerY = config.photo.y + config.photo.height / 2;
 
@@ -86,6 +92,7 @@ const AvatarCanvas = forwardRef(function AvatarCanvas(
       const scaledY = centerY - scaledHeight / 2 + position.y;
 
       ctx.save();
+
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.clip();
@@ -100,20 +107,30 @@ const AvatarCanvas = forwardRef(function AvatarCanvas(
 
       ctx.restore();
 
+      // Draw Number of Copies
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      ctx.fillStyle = config.title.color;
-      ctx.font = `600 ${config.title.fontSize}px Montserrat`;
-      ctx.fillText(title, config.title.x, config.title.y);
+      ctx.fillStyle = config.numberOfCopies.color;
+      ctx.font = `700 ${config.numberOfCopies.fontSize}px Montserrat`;
 
-      ctx.fillStyle = config.fullName.color;
-      ctx.font = `700 ${config.fullName.fontSize}px Montserrat`;
-      ctx.fillText(fullName, config.fullName.x, config.fullName.y);
+      ctx.fillText(
+        `${numberOfCopies} Copies`,
+        config.numberOfCopies.x,
+        config.numberOfCopies.y
+      );
     };
 
     render().catch(console.error);
-  }, [uploadedImage, frameImage, title, fullName, config, zoom, position]);
+  }, [
+    uploadedImage,
+    frameImage,
+    fullName,
+    numberOfCopies,
+    config,
+    zoom,
+    position,
+  ]);
 
   return (
     <div className="flex flex-col items-center gap-6">
