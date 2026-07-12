@@ -114,8 +114,10 @@ const AvatarCanvas = forwardRef(function AvatarCanvas(
       ctx.fillStyle = config.numberOfCopies.color;
       ctx.font = `700 ${config.numberOfCopies.fontSize}px Montserrat`;
 
+
+      const formattedCopies = Number(numberOfCopies).toLocaleString("en-US");
       ctx.fillText(
-        `${numberOfCopies}`,
+        formattedCopies,
         config.numberOfCopies.x,
         config.numberOfCopies.y
       );
