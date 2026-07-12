@@ -115,7 +115,7 @@ const AvatarCanvas = forwardRef(function AvatarCanvas(
       ctx.font = `700 ${config.numberOfCopies.fontSize}px Montserrat`;
 
       ctx.fillText(
-        `${numberOfCopies} Copies`,
+        `${numberOfCopies} Magazines`,
         config.numberOfCopies.x,
         config.numberOfCopies.y
       );
