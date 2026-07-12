@@ -13,7 +13,7 @@ export const avatarFrames = {
     numberOfCopies: {
       x: 240,
       y: 750,
-      fontSize: 65,
+      fontSize: 70,
       color: "#722b2b",
 
       align: "center",
