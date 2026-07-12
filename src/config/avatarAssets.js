@@ -1,4 +1,4 @@
-import healingStreamsFrame from "../assets/frame4.png";
+import healingStreamsFrame from "../assets/frame5.png";
 
 export const avatarAssets = {
   healingStreams: {
